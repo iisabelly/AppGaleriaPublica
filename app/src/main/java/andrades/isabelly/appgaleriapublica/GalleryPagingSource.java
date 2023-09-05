@@ -12,6 +12,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -33,7 +34,7 @@ public class GalleryPagingSource extends ListenableFuturePagingSource<Integer, I
 
     @NonNull
     @Override
-    public ListenableFuture<LoadResult<Integer, ImageData>> loadFuture(@NonNull LoadParams<Integer loadParams>) {
+    public ListenableFuture<LoadResult<Integer, ImageData>> loadFuture(@NonNull LoadParams<Integer> loadParams) {
         Integer nextPageNumber = loadParams.getKey();
         if (nextPageNumber == null) {
             nextPageNumber = 1;
@@ -58,14 +59,17 @@ public class GalleryPagingSource extends ListenableFuturePagingSource<Integer, I
                 try {
                     imageDataList = galleryRepository.loadImageData(loadParams.getLoadSize(), finalOffSet);
                     Integer nextKey = null;
-                    if(imageDataList.size() >= loadParams.getLoadSize()) {
+                    if (imageDataList.size() >= loadParams.getLoadSize()) {
                         nextKey = finalNextPageNumber + 1;
                     }
-                    // linha 47
+                    return new LoadResult.Page<Integer, ImageData>(imageDataList, null, nextKey);
+                } catch (FileNotFoundException e) {
+                    return new LoadResult.Error<>(e);
                 }
-            }
-        })
 
+            }
+        });
+        return lf;
     }
 
 }

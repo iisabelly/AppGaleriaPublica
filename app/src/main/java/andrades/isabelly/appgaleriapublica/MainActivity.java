@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             MainViewModel vm = new ViewModelProvider(this).get(MainViewModel.class);
             int navigationOpSelected = vm.getNavigationOpSelected();
-            bottomNavigationView.getSelectedItemId(navigationOpSelected);
+            bottomNavigationView.setSelectedItemId(navigationOpSelected);
         }
     }
 
